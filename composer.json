@@ -1,0 +1,25 @@
+{
+    "name": "ninjami/ninjadocs",
+    "description": "Simple docs for Laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Juho Karhu",
+            "email": "juho@ninjami.fi"
+        }
+    ],
+    "autoload": {
+        "classmap": [ "src/" ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ninjami\\Ninjadocs\\NinjadocsServiceProvider"
+            ],
+            "aliases": {
+                "Ninjadocs": "Ninjami\\Ninjadocs\\NinjadocsFacade"
+            }
+        }
+    },
+    "require": {}
+}
