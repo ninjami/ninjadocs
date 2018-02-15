@@ -21,5 +21,8 @@
             }
         }
     },
-    "require": {}
+    "require": {
+        "illuminate/support": "~5",
+        "erusev/parsedown": "^1.6"
+    }
 }
