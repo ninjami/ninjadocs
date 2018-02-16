@@ -18,7 +18,15 @@
 
         <style>
           body {
-            padding: 50px 0;
+            padding: 3rem 0;
+          }
+
+          .container {
+            max-width: 730px;
+          }
+
+          .table-of-contents {
+            margin: 3rem 0;
           }
 
           .anchor {
@@ -31,9 +39,26 @@
             outline: none;
           }
 
+          h1, h2, h3, h4, h5, h6 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+          }
+
+          .anchor h2, .anchor h3 {
+            font-weight: normal;
+          }
+
+          .h1-link { margin-left: 0em; font-weight: bold; }
+          .h2-link { margin-left: 0em; font-weight: bold; }
+          .h3-link { margin-left: 1.5em; }
+          .h4-link { margin-left: 3em; }
+          .h5-link { margin-left: 4.5em; }
+          .h6-link { margin-left: 6em; }
+
           img {
             max-width: 100%;
           }
+
         </style>
     </head>
     <body>

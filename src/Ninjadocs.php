@@ -266,6 +266,7 @@ class Parser extends Parsedown {
         return $Blocks;
     }
 
+    /* Generate markup from lines array */
     public function linesToMarkup(array $lines)
     {
       # ~
@@ -280,11 +281,13 @@ class Parser extends Parsedown {
           }
 
           $markup .= "\n";
+
           // Add link if is link
           if(isset($Block['link'])) {
             $markup .= '<a href="#' . $Block['link'] . '" id="' . $Block['link'] . '" class="anchor">';
           }
           $markup .= isset($Block['markup']) ? $Block['markup'] : $this->element($Block['element']);
+
           // End link if is link
           if(isset($Block['link'])) {
             $markup .= '</a>';
