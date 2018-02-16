@@ -1,6 +1,6 @@
 <?php
 
-namespace Ninjami\Ninjadocs;
+namespace Ninjami\Ninjadocs\Facades;
 
 use \Illuminate\Support\Facades\Facade;
 

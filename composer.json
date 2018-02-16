@@ -17,7 +17,7 @@
                 "Ninjami\\Ninjadocs\\NinjadocsServiceProvider"
             ],
             "aliases": {
-                "Ninjadocs": "Ninjami\\Ninjadocs\\NinjadocsFacade"
+                "Ninjadocs": "Ninjami\\Ninjadocs\\Facades\\NinjadocsFacade"
             }
         }
     },
