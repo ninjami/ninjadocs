@@ -1,6 +1,6 @@
 # Ninjadocs
 
-Simple documentation drom markdown files
+Simple documentation drom markdown files for Laravel 5
 
 ## 1. Install with composer
 
@@ -10,4 +10,4 @@ Simple documentation drom markdown files
 Create **.md** file in folder **resources/documentation**
 
 ## 3. Go to route
-Go to yourapp.test**/documentation/[name of .md file]**
+In your Laravel app, go to **/documentation/{name of .md file}**
