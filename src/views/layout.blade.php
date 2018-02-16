@@ -20,6 +20,20 @@
           body {
             padding: 50px 0;
           }
+
+          .anchor {
+            color: #000;
+          }
+          .anchor:hover {
+            color: #000;
+          }
+          .anchor:focus {
+            outline: none;
+          }
+
+          img {
+            max-width: 100%;
+          }
         </style>
     </head>
     <body>

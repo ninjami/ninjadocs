@@ -1,10 +1,11 @@
 <?php
+use Ninjami\Ninjadocs\Ninjadocs;
 
 // Show document
 Route::get('/documentation/{fileName}', function($fileName) {
 
   // Get file content
-  $content = Ninjadocs::contentFromFile($fileName);
+  $content = new Ninjadocs($fileName);
 
   return view('ninjadocs::document', [
     'content' => $content,
