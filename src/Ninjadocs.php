@@ -1,303 +1,285 @@
 <?php
 
 namespace Ninjami\Ninjadocs;
+
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 use Parsedown;
 
-class Ninjadocs {
+class Ninjadocs
+{
+	protected $fileName;
 
-  /**
-   * Lines
-   *
-   * @var array
-   */
-  protected $fileName;
-  protected $lines;
+	/**
+	 * Lines
+	 *
+	 * @var array
+	 */
+	protected $lines;
 
-  /**
-   * @param string $fileName
-   */
-  public function __construct($fileName)
-  {
-      $this->fileName = $fileName;
-      $this->lines = $this->linesFromFile($this->fileName);
-  }
+	/**
+	 * @param string $fileName
+	 */
+	public function __construct($fileName)
+	{
+		$this->fileName = $fileName;
+		$this->lines = $this->linesFromFile($this->fileName);
+	}
 
-  public function test() {
-    return 'lol';
-  }
+	public function test()
+	{
+		return 'lol';
+	}
 
-  /**
-   * Get content from file and parse to html
-   */
-  public function linesFromFile($fileName)
-  {
-    // Find .md file
-    $file = $this->getFile($fileName);
+	/**
+	 * Get content from file and parse to html
+	 */
+	public function linesFromFile($fileName)
+	{
+		// Find .md file
+		$file = $this->getFile($fileName);
 
-    $parser = new Parser();
-    $lines = $parser->textToLines($file);
+		$parser = new Parser();
+		$lines = $parser->textToLines($file);
 
-    return $lines;
-  }
+		return $lines;
+	}
 
-  /**
-   * Get file
-   */
-  private function getFile($fileName)
-  {
-    // File should be .md
-    $fileExtension = '.md';
+	/**
+	 * Get file
+	 */
+	private function getFile($fileName)
+	{
+		// File should be .md
+		$fileExtension = '.md';
 
-    // File path
-    $filePath = base_path() . '/resources/documentation/' . $fileName . $fileExtension;
+		// File path
+		$filePath = resource_path('documentation/' . $fileName . $fileExtension);
 
-    // if no file found in path, return error
-    if(!file_exists($filePath)) {
-      abort(404);
-    }
+		// if no file found in path, return error
+		if (!file_exists($filePath)) {
+			abort(404);
+		}
 
-    // Get file
-    $file = file_get_contents($filePath);
+		// Get file
+		$file = file_get_contents($filePath);
 
-    return $file;
-  }
+		return $file;
+	}
 
 
-  /**
-   * Get content as html
-   */
-  public function html()
-  {
-    # Create markup
-    $parser = new Parser();
-    $html = $parser->linesToMarkup($this->lines);
+	/**
+	 * Get content as html
+	 */
+	public function html()
+	{
+		# Create markup
+		$parser = new Parser();
+		$html = $parser->linesToMarkup($this->lines);
 
-    return $html;
-  }
+		return $html;
+	}
 
-  /**
-   * Get lines
-   */
-  public function lines()
-  {
-    return $this->lines;
-  }
+	/**
+	 * Get lines
+	 */
+	public function lines()
+	{
+		return $this->lines;
+	}
 }
 
 // Extend Parsedown
-class Parser extends Parsedown {
-  public function textToLines($text){
-    # make sure no definitions are set
-    $this->DefinitionData = array();
-    # standardize line breaks
-    $text = str_replace(array("\r\n", "\r"), "\n", $text);
-    # remove surrounding line breaks
-    $text = trim($text, "\n");
-    # split text into lines
-    $lines = explode("\n", $text);
-    # iterate through lines to identify blocks
-    $lines = $this->linesAsObjects($lines);
+class Parser extends Parsedown
+{
+	public function textToLines($text)
+	{
+		# make sure no definitions are set
+		$this->DefinitionData = array();
+		# standardize line breaks
+		$text = str_replace(array("\r\n", "\r"), "\n", $text);
+		# remove surrounding line breaks
+		$text = trim($text, "\n");
+		# split text into lines
+		$lines = explode("\n", $text);
+		# iterate through lines to identify blocks
+		$lines = $this->linesAsObjects($lines);
 
-    return $lines;
-  }
+		return $lines;
+	}
 
-    #
-    # Cutomized Blocks function
-    #
+	#
+	# Cutomized Blocks function
+	#
 
-    protected function linesAsObjects(array $lines)
-    {
-        $CurrentBlock = null;
+	protected function linesAsObjects(array $lines)
+	{
+		$CurrentBlock = null;
 
-        foreach ($lines as $line)
-        {
-            if (chop($line) === '')
-            {
-                if (isset($CurrentBlock))
-                {
-                    $CurrentBlock['interrupted'] = true;
-                }
+		foreach ($lines as $line) {
+			if (chop($line) === '') {
+				if (isset($CurrentBlock)) {
+					$CurrentBlock['interrupted'] = true;
+				}
 
-                continue;
-            }
+				continue;
+			}
 
-            if (strpos($line, "\t") !== false)
-            {
-                $parts = explode("\t", $line);
+			if (strpos($line, "\t") !== false) {
+				$parts = explode("\t", $line);
 
-                $line = $parts[0];
+				$line = $parts[0];
 
-                unset($parts[0]);
+				unset($parts[0]);
 
-                foreach ($parts as $part)
-                {
-                    $shortage = 4 - mb_strlen($line, 'utf-8') % 4;
+				foreach ($parts as $part) {
+					$shortage = 4 - mb_strlen($line, 'utf-8') % 4;
 
-                    $line .= str_repeat(' ', $shortage);
-                    $line .= $part;
-                }
-            }
+					$line .= str_repeat(' ', $shortage);
+					$line .= $part;
+				}
+			}
 
-            $indent = 0;
+			$indent = 0;
 
-            while (isset($line[$indent]) and $line[$indent] === ' ')
-            {
-                $indent ++;
-            }
+			while (isset($line[$indent]) and $line[$indent] === ' ') {
+				$indent++;
+			}
 
-            $text = $indent > 0 ? substr($line, $indent) : $line;
+			$text = $indent > 0 ? substr($line, $indent) : $line;
 
-            # ~
+			# ~
 
-            $Line = array('body' => $line, 'indent' => $indent, 'text' => $text);
+			$Line = array('body' => $line, 'indent' => $indent, 'text' => $text);
 
-            # ~
+			# ~
 
-            if (isset($CurrentBlock['continuable']))
-            {
-                $Block = $this->{'block'.$CurrentBlock['type'].'Continue'}($Line, $CurrentBlock);
+			if (isset($CurrentBlock['continuable'])) {
+				$Block = $this->{'block' . $CurrentBlock['type'] . 'Continue'}($Line, $CurrentBlock);
 
-                if (isset($Block))
-                {
-                    $CurrentBlock = $Block;
+				if (isset($Block)) {
+					$CurrentBlock = $Block;
 
-                    continue;
-                }
-                else
-                {
-                    if ($this->isBlockCompletable($CurrentBlock['type']))
-                    {
-                        $CurrentBlock = $this->{'block'.$CurrentBlock['type'].'Complete'}($CurrentBlock);
-                    }
-                }
-            }
+					continue;
+				} else {
+					if ($this->isBlockCompletable($CurrentBlock['type'])) {
+						$CurrentBlock = $this->{'block' . $CurrentBlock['type'] . 'Complete'}($CurrentBlock);
+					}
+				}
+			}
 
-            # ~
+			# ~
 
-            $marker = $text[0];
+			$marker = $text[0];
 
-            # ~
+			# ~
 
-            $blockTypes = $this->unmarkedBlockTypes;
+			$blockTypes = $this->unmarkedBlockTypes;
 
-            if (isset($this->BlockTypes[$marker]))
-            {
-                foreach ($this->BlockTypes[$marker] as $blockType)
-                {
-                    $blockTypes []= $blockType;
-                }
-            }
+			if (isset($this->BlockTypes[$marker])) {
+				foreach ($this->BlockTypes[$marker] as $blockType) {
+					$blockTypes[] = $blockType;
+				}
+			}
 
-            #
-            # ~
+			#
+			# ~
 
-            foreach ($blockTypes as $blockType)
-            {
-                $Block = $this->{'block'.$blockType}($Line, $CurrentBlock);
+			foreach ($blockTypes as $blockType) {
+				$Block = $this->{'block' . $blockType}($Line, $CurrentBlock);
 
-                if (isset($Block))
-                {
-                    $Block['type'] = $blockType;
+				if (isset($Block)) {
+					$Block['type'] = $blockType;
 
-                    if ( ! isset($Block['identified']))
-                    {
-                        $Blocks []= $CurrentBlock;
+					if (!isset($Block['identified'])) {
+						$Blocks[] = $CurrentBlock;
 
-                        $Block['identified'] = true;
-                    }
+						$Block['identified'] = true;
+					}
 
-                    if ($this->isBlockContinuable($blockType))
-                    {
-                        $Block['continuable'] = true;
-                    }
+					if ($this->isBlockContinuable($blockType)) {
+						$Block['continuable'] = true;
+					}
 
-                    $CurrentBlock = $Block;
+					$CurrentBlock = $Block;
 
-                    continue 2;
-                }
-            }
+					continue 2;
+				}
+			}
 
-            # ~
+			# ~
 
-            if (isset($CurrentBlock) and ! isset($CurrentBlock['type']) and ! isset($CurrentBlock['interrupted']))
-            {
-                $CurrentBlock['element']['text'] .= "\n".$text;
-            }
-            else
-            {
-                $Blocks []= $CurrentBlock;
+			if (isset($CurrentBlock) and !isset($CurrentBlock['type']) and !isset($CurrentBlock['interrupted'])) {
+				$CurrentBlock['element']['text'] .= "\n" . $text;
+			} else {
+				$Blocks[] = $CurrentBlock;
 
-                $CurrentBlock = $this->paragraph($Line);
+				$CurrentBlock = $this->paragraph($Line);
 
-                $CurrentBlock['identified'] = true;
-            }
-        }
+				$CurrentBlock['identified'] = true;
+			}
+		}
 
-        # ~
+		# ~
 
-        if (isset($CurrentBlock['continuable']) and $this->isBlockCompletable($CurrentBlock['type']))
-        {
-            $CurrentBlock = $this->{'block'.$CurrentBlock['type'].'Complete'}($CurrentBlock);
-        }
+		if (isset($CurrentBlock['continuable']) and $this->isBlockCompletable($CurrentBlock['type'])) {
+			$CurrentBlock = $this->{'block' . $CurrentBlock['type'] . 'Complete'}($CurrentBlock);
+		}
 
-        # ~
+		# ~
 
-        $Blocks []= $CurrentBlock;
+		$Blocks[] = $CurrentBlock;
 
-        unset($Blocks[0]);
+		unset($Blocks[0]);
 
-        # ~
+		# ~
 
-        foreach ($Blocks as $key => $Block)
-        {
-            if (isset($Block['hidden']))
-            {
-                continue;
-            }
+		foreach ($Blocks as $key => $Block) {
+			if (isset($Block['hidden'])) {
+				continue;
+			}
 
-            // Add link if is header
-            if(isset($Block['type']) && $Block['type'] == 'Header') {
-              $Blocks[$key]['link'] = str_slug($Block['element']['text']);
-            }
-        }
+			// Add link if is header
+			if (isset($Block['type']) && $Block['type'] == 'Header') {
+				$Blocks[$key]['link'] = Str::slug($Block['element']['text']);
+			}
+		}
 
-        # ~
+		# ~
 
-        return $Blocks;
-    }
+		return $Blocks;
+	}
 
-    /* Generate markup from lines array */
-    public function linesToMarkup(array $lines)
-    {
-      # ~
+	/* Generate markup from lines array */
+	public function linesToMarkup(array $lines)
+	{
+		# ~
 
-      $markup = '';
+		$markup = '';
 
-      foreach ($lines as $Block)
-      {
-          if (isset($Block['hidden']))
-          {
-              continue;
-          }
+		foreach ($lines as $Block) {
+			if (isset($Block['hidden'])) {
+				continue;
+			}
 
-          $markup .= "\n";
+			$markup .= "\n";
 
-          // Add link if is link
-          if(isset($Block['link'])) {
-            $markup .= '<a href="#' . $Block['link'] . '" id="' . $Block['link'] . '" class="anchor">';
-          }
-          $markup .= isset($Block['markup']) ? $Block['markup'] : $this->element($Block['element']);
+			// Add link if is link
+			if (isset($Block['link'])) {
+				$markup .= '<a href="#' . $Block['link'] . '" id="' . $Block['link'] . '" class="anchor">';
+			}
+			$markup .= isset($Block['markup']) ? $Block['markup'] : $this->element($Block['element']);
 
-          // End link if is link
-          if(isset($Block['link'])) {
-            $markup .= '</a>';
-          }
-      }
+			// End link if is link
+			if (isset($Block['link'])) {
+				$markup .= '</a>';
+			}
+		}
 
-      $markup .= "\n";
+		$markup .= "\n";
 
-      # ~
+		# ~
 
-      return $markup;
-    }
+		return $markup;
+	}
 }
